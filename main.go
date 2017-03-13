@@ -7,18 +7,26 @@ import (
 )
 
 func ShowICS(w http.ResponseWriter, r *http.Request) {
-	file, _ := os.Open("basic.ics")
+	file, err := os.Open("basic.ics")
+	if err != nil {
+		panic(err)
+	}
+
 	defer file.Close()
 
 	buf := make([]byte, 1024)
 	for {
-		n, _ := file.Read(buf)
+		n, err := file.Read(buf)
 		if n == 0 {
 			break
 		}
-		fmt.Fprintf(w, string(buf[:n]))
+		if err != nil {
+			panic(err)
+		}
+		fmt.Fprintf(w, string(buf))
 	}
 }
+
 func main() {
 	http.HandleFunc("/calendar.ics", ShowICS)
 	http.ListenAndServe(":80", nil)
