@@ -2,8 +2,11 @@ package main
 
 import (
 	"fmt"
+	"github.com/taroooyan/go-esa/esa"
 	"net/http"
+	"net/url"
 	"os"
+	"strconv"
 )
 
 func ShowICS(w http.ResponseWriter, r *http.Request) {
@@ -27,7 +30,37 @@ func ShowICS(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func saveArticle() {
+	// Initialization
+	client := esa.NewClient(os.Getenv("ESA_API"))
+
+	searchQuery := url.Values{}
+	searchQuery.Add("in", "日報")
+	page := "1"
+	for {
+		query := url.Values{}
+		query.Add("page", page)
+
+		postsResponse, err := client.Post.GetPosts("taroooyan", searchQuery, query)
+		if err != nil {
+			panic(err)
+		}
+
+		for _, post := range postsResponse.Posts {
+			fmt.Println(post.Number)
+		}
+
+		if postsResponse.NextPage == nil {
+			break
+		} else {
+			t := postsResponse.NextPage
+			page = strconv.FormatFloat(t.(float64), 'G', 4, 64)
+		}
+	}
+}
+
 func main() {
-	http.HandleFunc("/calendar.ics", ShowICS)
-	http.ListenAndServe(":80", nil)
+	saveArticle()
+	// http.HandleFunc("/calendar.ics", ShowICS)
+	// http.ListenAndServe(":80", nil)
 }
