@@ -34,14 +34,14 @@ func saveArticle() {
 	// Initialization
 	client := esa.NewClient(os.Getenv("ESA_API"))
 
-	searchQuery := url.Values{}
-	searchQuery.Add("in", "日報")
 	page := "1"
 	for {
 		query := url.Values{}
+		query.Add("in", "日報")
 		query.Add("page", page)
+		query.Add("order", "asc")
 
-		postsResponse, err := client.Post.GetPosts("taroooyan", searchQuery, query)
+		postsResponse, err := client.Post.GetPosts("taroooyan", query)
 		if err != nil {
 			panic(err)
 		}
