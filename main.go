@@ -9,7 +9,7 @@ import (
 	"strconv"
 )
 
-func ShowICS(w http.ResponseWriter, r *http.Request) {
+func readICS(w http.ResponseWriter, r *http.Request) {
 	file, err := os.Open("basic.ics")
 	if err != nil {
 		panic(err)
@@ -64,6 +64,6 @@ func takeArticle() []esa.PostResponse {
 
 func main() {
   takeArticle()
-	// http.HandleFunc("/calendar.ics", ShowICS)
+	// http.HandleFunc("/calendar.ics", readICS)
 	// http.ListenAndServe(":80", nil)
 }
