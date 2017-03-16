@@ -66,7 +66,7 @@ func takeArticle() []esa.PostResponse {
 func main() {
 	// createICS()
 	// takeArticle()
-	http.HandleFunc("/calendar.ics", createICS)
+	http.HandleFunc("/calendar.ics", printICS)
 	http.ListenAndServe(":80", nil)
 }
 
@@ -98,7 +98,7 @@ type Vevent struct {
 	End      string `ick:"END"`
 }
 
-func createICS(w http.ResponseWriter, r *http.Request) {
+func createICS() ICalnedar {
 	ical := ICalnedar{}
 
 	ical.Begin = "VCALENDAR"
@@ -126,9 +126,13 @@ func createICS(w http.ResponseWriter, r *http.Request) {
 	event.End = "VEVENT"
 
 	ical.Vevent = append(ical.Vevent, event)
+	ical.Vevent = append(ical.Vevent, event)
 
 	ical.End = "VCALENDAR"
-
+	return ical
+}
+func printICS(w http.ResponseWriter, r *http.Request) {
+	ical := createICS()
 	icalType := reflect.TypeOf(ical)
 	icalValue := reflect.ValueOf(ical)
 	for i := 0; i < icalType.NumField(); i++ {
