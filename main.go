@@ -114,10 +114,10 @@ func createICS() ICalnedar {
 	event.Dtstart = "20170320"
 	event.Dtend = "20170321"
 	// event.Dtstamp = "20170313T223209Z"
-	event.Uid = "aaaaaaaabvjds"
+	event.Uid = "aaaaaaaa"
 	event.Class = "PUBLISH"
 	// event.Created = "20150421T224828Z"
-	event.Description = "testkdsa"
+	event.Description = "test1"
 	// event.LastModified = "20150421T224828Z"
 	event.Sequence = "0"
 	event.Status = "CONFIRMED"
@@ -126,11 +126,19 @@ func createICS() ICalnedar {
 	event.End = "VEVENT"
 
 	ical.Vevent = append(ical.Vevent, event)
+
+	// crate event
+	event.Dtstart = "20170321"
+	event.Dtend = "20170322"
+	event.Uid = "bbbbbbbbb"
+	event.Description = "test2"
+
 	ical.Vevent = append(ical.Vevent, event)
 
 	ical.End = "VCALENDAR"
 	return ical
 }
+
 func printICS(w http.ResponseWriter, r *http.Request) {
 	ical := createICS()
 	icalType := reflect.TypeOf(ical)
@@ -140,12 +148,13 @@ func printICS(w http.ResponseWriter, r *http.Request) {
 		if icalTag != "_VEVENT" {
 			fmt.Fprintf(w, "%s:%s\n", icalTag, icalValue.Field(i).Interface())
 		} else {
-			// TODO update some events
-			eventType := reflect.TypeOf(ical.Vevent[0])
-			eventValue := reflect.ValueOf(ical.Vevent[0])
-			for j := 0; j < eventType.NumField(); j++ {
-				eventTag := eventType.Field(j).Tag.Get("ick")
-				fmt.Fprintf(w, "%s:%s\n", eventTag, eventValue.Field(j).Interface())
+			for _, event := range ical.Vevent {
+				eventType := reflect.TypeOf(event)
+				eventValue := reflect.ValueOf(event)
+				for j := 0; j < eventType.NumField(); j++ {
+					eventTag := eventType.Field(j).Tag.Get("ick")
+					fmt.Fprintf(w, "%s:%s\n", eventTag, eventValue.Field(j).Interface())
+				}
 			}
 		}
 	}
