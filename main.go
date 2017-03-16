@@ -30,25 +30,22 @@ func ShowICS(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func saveArticle() {
-	// Initialization
+// esa.ioから日報カテゴリのすべての記事を取得
+func takeArticle() []esa.PostResponse {
 	client := esa.NewClient(os.Getenv("ESA_API"))
+  articles := []esa.PostResponse{}
 
 	page := "1"
 	for {
 		query := url.Values{}
 		query.Add("in", "日報")
-		query.Add("page", page)
-		query.Add("order", "asc")
-
+    query.Add("page", page)
 		postsResponse, err := client.Post.GetPosts("taroooyan", query)
 		if err != nil {
 			panic(err)
 		}
 
-		for _, post := range postsResponse.Posts {
-			fmt.Println(post.Number)
-		}
+    articles = append(articles, postsResponse.Posts...)
 
 		if postsResponse.NextPage == nil {
 			break
@@ -57,10 +54,16 @@ func saveArticle() {
 			page = strconv.FormatFloat(t.(float64), 'G', 4, 64)
 		}
 	}
+
+  for _, post := range articles {
+    fmt.Println(post.Category)
+  }
+
+  return articles
 }
 
 func main() {
-	saveArticle()
+  takeArticle()
 	// http.HandleFunc("/calendar.ics", ShowICS)
 	// http.ListenAndServe(":80", nil)
 }
