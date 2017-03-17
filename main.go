@@ -8,6 +8,8 @@ import (
 	"os"
 	"reflect"
 	"strconv"
+	"strings"
+	"time"
 )
 
 func readICS(w http.ResponseWriter, r *http.Request) {
@@ -57,17 +59,28 @@ func takeArticle() []esa.PostResponse {
 	}
 
 	for _, post := range articles {
-		fmt.Println(post.Category)
+		fmt.Printf("%#v\n", post.Category)
+		fmt.Println(strings.Join(strings.Split(post.Category, "/")[1:], ""))
+
+		dateSplit := strings.Split(post.Category, "/")[1:]
+		y, _ := strconv.Atoi(dateSplit[0])
+		m, _ := strconv.Atoi(dateSplit[1])
+		d, _ := strconv.Atoi(dateSplit[2])
+		t := time.Date(y, time.Month(m), d, 0, 0, 0, 0, time.UTC)
+		t = t.AddDate(0, 0, 1)
+		fmt.Println(y, m, d)
+		fmt.Println(t.Format("20060102"))
+
 	}
 
 	return articles
 }
 
 func main() {
-	// createICS()
 	// takeArticle()
+
 	http.HandleFunc("/calendar.ics", printICS)
-	http.ListenAndServe(":80", nil)
+	http.ListenAndServe(":8080", nil)
 }
 
 type ICalnedar struct {
@@ -99,41 +112,47 @@ type Vevent struct {
 }
 
 func createICS() ICalnedar {
+	articles := takeArticle()
 	ical := ICalnedar{}
 
+	// initialize iCalendar
 	ical.Begin = "VCALENDAR"
-	ical.Prodid = "taroooyan"
+	ical.Prodid = "esa/taroooyan"
 	ical.Version = "2.0"
 	ical.Calscale = "GREGORIAN"
 	ical.Method = "PUBLISH"
 	ical.Xwrtimezone = "UTC"
 
-	// crate event
-	event := Vevent{}
-	event.Begin = "VEVENT"
-	event.Dtstart = "20170320"
-	event.Dtend = "20170321"
-	// event.Dtstamp = "20170313T223209Z"
-	event.Uid = "aaaaaaaa"
-	event.Class = "PUBLISH"
-	// event.Created = "20150421T224828Z"
-	event.Description = "test1"
-	// event.LastModified = "20150421T224828Z"
-	event.Sequence = "0"
-	event.Status = "CONFIRMED"
-	event.Summary = "TEST"
-	event.Transp = "TRANSPARENT"
-	event.End = "VEVENT"
+	// crate events
+	for _, post := range articles {
+		fmt.Println(post.Category)
 
-	ical.Vevent = append(ical.Vevent, event)
+		event := Vevent{}
+		event.Begin = "VEVENT"
 
-	// crate event
-	event.Dtstart = "20170321"
-	event.Dtend = "20170322"
-	event.Uid = "bbbbbbbbb"
-	event.Description = "test2"
+		// convert "日報/2016/09/13" to 20160913
+		dateSplit := strings.Split(post.Category, "/")[1:]
+		event.Dtstart = strings.Join(dateSplit, "")
 
-	ical.Vevent = append(ical.Vevent, event)
+		y, _ := strconv.Atoi(dateSplit[0])
+		m, _ := strconv.Atoi(dateSplit[1])
+		d, _ := strconv.Atoi(dateSplit[2])
+		t := time.Date(y, time.Month(m), d, 0, 0, 0, 0, time.UTC)
+		t = t.AddDate(0, 0, 1)
+		dateEnd := t.Format("20060102")
+		event.Dtend = dateEnd
+
+		event.Uid = event.Dtstart
+		event.Class = "PUBLISH"
+		event.Description = post.BodyMd
+		event.Sequence = "0"
+		event.Status = "CONFIRMED"
+		event.Summary = "日報"
+		event.Transp = "TRANSPARENT"
+		event.End = "VEVENT"
+
+		ical.Vevent = append(ical.Vevent, event)
+	}
 
 	ical.End = "VCALENDAR"
 	return ical
