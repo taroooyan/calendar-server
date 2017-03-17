@@ -144,7 +144,7 @@ func createICS() ICalnedar {
 
 		event.Uid = event.Dtstart
 		event.Class = "PUBLISH"
-		event.Description = post.BodyMd
+		event.Description = strings.Replace(post.BodyMd, "\r\n", "\\n", -1)
 		event.Sequence = "0"
 		event.Status = "CONFIRMED"
 		event.Summary = "日報"
