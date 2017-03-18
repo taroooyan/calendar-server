@@ -52,8 +52,6 @@ func CreateICS() ICalnedar {
 
 	// crate events
 	for _, post := range articles {
-		fmt.Println(post.Category)
-
 		event := Vevent{}
 		event.Begin = "VEVENT"
 
