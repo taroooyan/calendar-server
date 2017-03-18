@@ -11,31 +11,31 @@ import (
 )
 
 type ICalnedar struct {
-	Begin       string   `ick:"BEGIN"`
-	Prodid      string   `ick:"PRODID"`
-	Version     string   `ick:"VERSION"`
-	Calscale    string   `ick:"CALSCALE"`
-	Method      string   `ick:"METHOD"`
-	Xwrtimezone string   `ick:"X-WR-TIMEZONE"`
-	Vevent      []Vevent `ick:"_VEVENT"`
-	End         string   `ick:"END"`
+	Begin       string   `ics:"BEGIN"`
+	Prodid      string   `ics:"PRODID"`
+	Version     string   `ics:"VERSION"`
+	Calscale    string   `ics:"CALSCALE"`
+	Method      string   `ics:"METHOD"`
+	Xwrtimezone string   `ics:"X-WR-TIMEZONE"`
+	Vevent      []Vevent
+	End         string   `ics:"END"`
 }
 
 type Vevent struct {
-	Begin   string `ick:"BEGIN"`
-	Dtstart string `ick:"DTSTART"`
-	Dtend   string `ick:"DTEND"`
-	// Dtstamp      string `ick:"DTSTAMP`
-	Uid   string `ick:"UID"`
-	Class string `ick:"CLASS"`
-	// Created      string `ick:"CREATED"`
-	Description string `ick:"DESCRIPTION"`
-	// LastModified string `ick:"LAST-MODIFIED"`
-	Sequence string `ick:"SEQUENCE"`
-	Status   string `ick:"STATUS"`
-	Summary  string `ick:"SUMMARY"`
-	Transp   string `ick:"TRANSP"`
-	End      string `ick:"END"`
+	Begin   string `ics:"BEGIN"`
+	Dtstart string `ics:"DTSTART"`
+	Dtend   string `ics:"DTEND"`
+	// Dtstamp      string `ics:"DTSTAMP`
+	Uid   string `ics:"UID"`
+	Class string `ics:"CLASS"`
+	// Created      string `ics:"CREATED"`
+	Description string `ics:"DESCRIPTION"`
+	// LastModified string `ics:"LAST-MODIFIED"`
+	Sequence string `ics:"SEQUENCE"`
+	Status   string `ics:"STATUS"`
+	Summary  string `ics:"SUMMARY"`
+	Transp   string `ics:"TRANSP"`
+	End      string `ics:"END"`
 }
 
 func CreateICS() ICalnedar {
@@ -88,15 +88,15 @@ func PrintICS(w http.ResponseWriter, r *http.Request) {
 	icalType := reflect.TypeOf(ical)
 	icalValue := reflect.ValueOf(ical)
 	for i := 0; i < icalType.NumField(); i++ {
-		icalTag := icalType.Field(i).Tag.Get("ick")
-		if icalTag != "_VEVENT" {
+		icalTag := icalType.Field(i).Tag.Get("ics")
+		if icalTag != "" {
 			fmt.Fprintf(w, "%s:%s\n", icalTag, icalValue.Field(i).Interface())
 		} else {
 			for _, event := range ical.Vevent {
 				eventType := reflect.TypeOf(event)
 				eventValue := reflect.ValueOf(event)
 				for j := 0; j < eventType.NumField(); j++ {
-					eventTag := eventType.Field(j).Tag.Get("ick")
+					eventTag := eventType.Field(j).Tag.Get("ics")
 					fmt.Fprintf(w, "%s:%s\n", eventTag, eventValue.Field(j).Interface())
 				}
 			}
