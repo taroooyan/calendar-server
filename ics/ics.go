@@ -38,7 +38,7 @@ type Vevent struct {
 	End      string `ics:"END"`
 }
 
-func CreateICS() ICalnedar {
+func createICS() ICalnedar {
 	articles := esa.TakeArticle()
 	ical := ICalnedar{}
 
@@ -84,7 +84,7 @@ func CreateICS() ICalnedar {
 }
 
 func PrintICS(w http.ResponseWriter, r *http.Request) {
-	ical := CreateICS()
+	ical := createICS()
 	icalType := reflect.TypeOf(ical)
 	icalValue := reflect.ValueOf(ical)
 	for i := 0; i < icalType.NumField(); i++ {
