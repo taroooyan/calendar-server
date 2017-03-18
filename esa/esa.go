@@ -1,7 +1,7 @@
 package esa
 
 import (
-  "fmt"
+	"fmt"
 	"github.com/taroooyan/go-esa/esa"
 	"net/url"
 	"os"
@@ -10,9 +10,9 @@ import (
 	"time"
 )
 
-
 // esa.ioから日報カテゴリのすべての記事を取得
 func TakeArticle() []esa.PostResponse {
+	team := os.Getenv("ESA_TEAM")
 	client := esa.NewClient(os.Getenv("ESA_API"))
 	articles := []esa.PostResponse{}
 
@@ -21,7 +21,7 @@ func TakeArticle() []esa.PostResponse {
 		query := url.Values{}
 		query.Add("in", "日報")
 		query.Add("page", page)
-		postsResponse, err := client.Post.GetPosts("taroooyan", query)
+		postsResponse, err := client.Post.GetPosts(team, query)
 		if err != nil {
 			panic(err)
 		}
