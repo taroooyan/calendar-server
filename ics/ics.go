@@ -11,31 +11,28 @@ import (
 )
 
 type ICalnedar struct {
-	Begin       string   `ics:"BEGIN"`
-	Prodid      string   `ics:"PRODID"`
-	Version     string   `ics:"VERSION"`
-	Calscale    string   `ics:"CALSCALE"`
-	Method      string   `ics:"METHOD"`
-	Xwrtimezone string   `ics:"X-WR-TIMEZONE"`
+	Begin       string `ics:"BEGIN"`
+	Prodid      string `ics:"PRODID"`
+	Version     string `ics:"VERSION"`
+	Calscale    string `ics:"CALSCALE"`
+	Method      string `ics:"METHOD"`
+	Xwrtimezone string `ics:"X-WR-TIMEZONE"`
 	Vevent      []Vevent
-	End         string   `ics:"END"`
+	End         string `ics:"END"`
 }
 
 type Vevent struct {
-	Begin   string `ics:"BEGIN"`
-	Dtstart string `ics:"DTSTART"`
-	Dtend   string `ics:"DTEND"`
-	// Dtstamp      string `ics:"DTSTAMP`
-	Uid   string `ics:"UID"`
-	Class string `ics:"CLASS"`
-	// Created      string `ics:"CREATED"`
+	Begin       string `ics:"BEGIN"`
+	Dtstart     string `ics:"DTSTART"`
+	Dtend       string `ics:"DTEND"`
+	Uid         string `ics:"UID"`
+	Class       string `ics:"CLASS"`
 	Description string `ics:"DESCRIPTION"`
-	// LastModified string `ics:"LAST-MODIFIED"`
-	Sequence string `ics:"SEQUENCE"`
-	Status   string `ics:"STATUS"`
-	Summary  string `ics:"SUMMARY"`
-	Transp   string `ics:"TRANSP"`
-	End      string `ics:"END"`
+	Sequence    string `ics:"SEQUENCE"`
+	Status      string `ics:"STATUS"`
+	Summary     string `ics:"SUMMARY"`
+	Transp      string `ics:"TRANSP"`
+	End         string `ics:"END"`
 }
 
 func createICS() ICalnedar {
@@ -87,11 +84,13 @@ func PrintICS(w http.ResponseWriter, r *http.Request) {
 	ical := createICS()
 	icalType := reflect.TypeOf(ical)
 	icalValue := reflect.ValueOf(ical)
+	// print ICalnedar
 	for i := 0; i < icalType.NumField(); i++ {
 		icalTag := icalType.Field(i).Tag.Get("ics")
 		if icalTag != "" {
 			fmt.Fprintf(w, "%s:%s\n", icalTag, icalValue.Field(i).Interface())
 		} else {
+			// print multi Vevent
 			for _, event := range ical.Vevent {
 				eventType := reflect.TypeOf(event)
 				eventValue := reflect.ValueOf(event)
