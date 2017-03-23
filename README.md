@@ -11,6 +11,10 @@ ESA_API="ACCESS TOKEN OF ESA"
 ESA_TEAM="TEAM NAME OF ESA"
 ```
 
+## ToDo
+- [] OAuth認証を付ける
+
+
 
 ## License
 MIT
